@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReThread Circle Piece — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="catalog.html">Shop New</a>
+        <a class="nav-link" href="takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="circle.html">ReThread Circle</a>
+        <a class="nav-link" href="brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <main class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-6 pb-20">
+    <a href="circle.html" class="inline-flex items-center gap-1.5 text-[0.9rem] mb-6 text-indigo font-medium hover:underline">← ReThread Circle</a>
+
+    <div id="item-skeleton" class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <div class="skeleton aspect-square rounded-lg"></div>
+      <div class="flex flex-col gap-3">
+        <div class="skeleton h-4 w-24 rounded"></div>
+        <div class="skeleton h-9 w-3/4 rounded"></div>
+        <div class="skeleton h-6 w-1/3 rounded"></div>
+        <div class="skeleton h-11 w-40 rounded-lg mt-4"></div>
+      </div>
+    </div>
+    <p id="item-status" class="text-[0.95rem] text-[#4a443c]" hidden></p>
+
+    <div id="item-content" class="grid grid-cols-1 md:grid-cols-2 gap-12" hidden>
+
+      <!-- Image -->
+      <section class="flex flex-col gap-3">
+        <div class="aspect-square bg-cotton-dark bg-cover bg-center rounded-lg border border-ink/10" id="item-image"></div>
+      </section>
+
+      <!-- Info -->
+      <section class="flex flex-col gap-1.5">
+        <span class="badge badge-moss w-fit" id="item-source"></span>
+        <h1 class="font-display text-[2rem] m-0 leading-[1.15] mt-2" id="item-name"></h1>
+        <div class="text-[0.9rem] text-[#4a443c]" id="item-rating"></div>
+
+        <div class="my-3 flex items-baseline gap-2.5 flex-wrap" id="item-price"></div>
+
+        <p class="text-[0.85rem] text-[#4a443c] mt-1 min-h-[1.2em]" id="item-note">One of a kind — made from take-back materials.</p>
+
+        <button class="btn btn-primary mt-3 self-start" id="add-to-bag-btn">Add to Bag</button>
+
+        <div class="mt-6 text-[0.92rem] text-[#3a352e]" id="item-description"></div>
+      </section>
+
+      <!-- Reviews -->
+      <section class="col-span-full border-t border-ink/[0.12] pt-8 mt-4">
+        <h2 class="font-display text-[1.4rem] mb-5">Reviews</h2>
+        <div id="review-list" class="flex flex-col gap-5 mb-8"></div>
+
+        <div id="review-form-signed-out" class="text-[0.9rem] text-[#4a443c]">
+          <a href="auth.html" class="text-indigo font-semibold hover:underline">Sign in</a> to write a review.
+        </div>
+
+        <form id="review-form" hidden class="max-w-[480px] flex flex-col gap-3">
+          <h3 class="font-display text-[1.1rem] m-0">Write a review</h3>
+          <div id="review-form-status"></div>
+
+          <label class="field-group text-[0.85rem] font-medium">
+            <span>Rating</span>
+            <select id="review-rating" class="field-select" required>
+              <option value="">Select a rating</option>
+              <option value="5">★★★★★ — Excellent</option>
+              <option value="4">★★★★☆ — Good</option>
+              <option value="3">★★★☆☆ — Okay</option>
+              <option value="2">★★☆☆☆ — Not great</option>
+              <option value="1">★☆☆☆☆ — Poor</option>
+            </select>
+          </label>
+
+          <label class="field-group text-[0.85rem] font-medium">
+            <span>Title (optional)</span>
+            <input id="review-title" type="text" class="field-input" maxlength="120" placeholder="Sum it up in a few words" />
+          </label>
+
+          <label class="field-group text-[0.85rem] font-medium">
+            <span>Your review</span>
+            <textarea id="review-text" class="field-input" rows="4" maxlength="1000" placeholder="What did you think?"></textarea>
+          </label>
+
+          <button type="submit" class="btn btn-primary self-start" id="review-submit-btn">Submit Review</button>
+        </form>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "auth.html";
+    window.ACCOUNT_HREF = "account.html";
+    window.BRAND_HREF = "brand-portal.html";
+    window.HOME_HREF = "../index.html";
+  </script>
+  <script src="../auth-utils.js"></script>
+  <script src="circle-item.js"></script>
+</body>
+</html>

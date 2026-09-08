@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReThread — Debug: Connection Test</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <header class="max-w-[1100px] mx-auto px-8 pt-8 pb-6">
+    <h1 class="font-display font-medium text-[2rem] mb-6">Debug: Connection Test</h1>
+    <p class="text-[1.15rem] max-w-[46ch] text-[#4a443c]">Internal page — checks that the site can read from Supabase. Not linked from the site nav.</p>
+  </header>
+
+  <main class="max-w-[700px] mx-auto my-8 px-6">
+    <div class="bg-cotton-dark border border-ink/[0.15] rounded-lg p-6">
+      <p id="status">Checking connection…</p>
+      <ul id="product-list" class="list-none p-0"></ul>
+    </div>
+  </main>
+
+  <script src="../supabaseClient.js"></script>
+  <script src="debug.js"></script>
+</body>
+</html>

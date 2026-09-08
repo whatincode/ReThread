@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>My Account — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="catalog.html">Shop New</a>
+        <a class="nav-link" href="takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="circle.html">ReThread Circle</a>
+        <a class="nav-link" href="brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <header class="max-w-[800px] mx-auto px-6 sm:px-8 pt-12 pb-6">
+    <h1 class="font-display font-medium text-[2.25rem]">My Account</h1>
+  </header>
+
+  <main class="max-w-[800px] mx-auto px-6 sm:px-8 pb-24">
+
+    <div id="account-loading" class="panel p-8 text-center text-[#6b6459]">Loading your account…</div>
+
+    <div id="account-signed-out" class="panel p-8 text-center flex flex-col items-center gap-4" hidden>
+      <p class="text-[1.05rem]">Sign in to view your account.</p>
+      <a href="auth.html" class="btn btn-primary">Sign In</a>
+    </div>
+
+    <div id="account-content" hidden class="flex flex-col gap-10">
+
+      <!-- Profile -->
+      <section class="panel p-7 sm:p-9">
+        <h2 class="font-display text-[1.3rem] mb-6">Profile &amp; shipping details</h2>
+        <form id="profile-form" class="flex flex-col gap-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="field-group">
+              <label for="acc-full-name" class="field-label">Full name</label>
+              <input id="acc-full-name" class="field-input" placeholder="Ada Lovelace" />
+            </div>
+            <div class="field-group">
+              <label for="acc-email" class="field-label">Email</label>
+              <input id="acc-email" class="field-input" disabled />
+            </div>
+            <div class="field-group">
+              <label for="acc-phone" class="field-label">Phone</label>
+              <input id="acc-phone" class="field-input" placeholder="10-digit mobile number" />
+            </div>
+            <div class="field-group">
+              <label for="acc-country" class="field-label">Country</label>
+              <input id="acc-country" class="field-input" placeholder="India" />
+            </div>
+            <div class="field-group sm:col-span-2">
+              <label for="acc-address1" class="field-label">Address line 1</label>
+              <input id="acc-address1" class="field-input" placeholder="House / flat, street" />
+            </div>
+            <div class="field-group sm:col-span-2">
+              <label for="acc-address2" class="field-label">Address line 2 (optional)</label>
+              <input id="acc-address2" class="field-input" placeholder="Landmark, area" />
+            </div>
+            <div class="field-group">
+              <label for="acc-city" class="field-label">City</label>
+              <input id="acc-city" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label for="acc-state" class="field-label">State</label>
+              <input id="acc-state" class="field-input" />
+            </div>
+            <div class="field-group">
+              <label for="acc-postal" class="field-label">Postal code</label>
+              <input id="acc-postal" class="field-input" />
+            </div>
+          </div>
+          <div class="flex items-center gap-4">
+            <button type="submit" class="btn btn-primary" id="profile-save-btn">Save changes</button>
+            <div id="profile-status" class="min-h-[1.2em]"></div>
+          </div>
+        </form>
+      </section>
+
+      <!-- Order history -->
+      <section>
+        <h2 class="font-display text-[1.3rem] mb-4">Your orders</h2>
+        <p id="orders-status" class="text-[0.9rem] text-[#4a443c] mb-4">Loading…</p>
+        <div id="orders-list" class="flex flex-col gap-3"></div>
+      </section>
+
+      <!-- Take-back history -->
+      <section>
+        <h2 class="font-display text-[1.3rem] mb-4">Your take-back requests</h2>
+        <p id="takeback-status" class="text-[0.9rem] text-[#4a443c] mb-4">Loading…</p>
+        <div id="takeback-list" class="flex flex-col gap-3"></div>
+      </section>
+
+    </div>
+
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "auth.html";
+    window.ACCOUNT_HREF = "account.html";
+    window.BRAND_HREF = "brand-portal.html";
+    window.HOME_HREF = "../index.html";
+  </script>
+  <script src="../auth-utils.js"></script>
+  <script src="account.js"></script>
+</body>
+</html>

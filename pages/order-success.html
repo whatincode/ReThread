@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Order Confirmed — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+    </div>
+  </nav>
+
+  <main class="max-w-[560px] mx-auto px-6 pt-16 pb-24 text-center">
+    <div class="panel p-10 flex flex-col items-center gap-4 animate-fade-up">
+      <span class="text-4xl">✅</span>
+      <h1 class="font-display text-[1.7rem]">Order confirmed</h1>
+      <p id="order-ref" class="text-[#6b6459]"></p>
+      <p class="text-[0.92rem] text-[#4a443c]">Thanks for shopping circular. We'll email you as your order ships.</p>
+      <div class="flex gap-3 mt-2">
+        <a href="account.html" class="btn btn-secondary">View orders</a>
+        <a href="catalog.html" class="btn btn-primary">Keep shopping</a>
+      </div>
+    </div>
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script>
+    const orderId = new URLSearchParams(window.location.search).get("order");
+    document.getElementById("order-ref").textContent = orderId ? `Order #${orderId}` : "";
+  </script>
+</body>
+</html>

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Brand Portal — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="catalog.html">Shop New</a>
+        <a class="nav-link" href="takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="circle.html">ReThread Circle</a>
+        <a class="nav-link" href="brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <header class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-12 pb-6">
+    <h1 class="font-display font-medium text-[2.25rem] mb-3">Brand Portal</h1>
+    <p class="text-[1.1rem] max-w-[52ch] text-[#4a443c]">Add new products, manage images and stock, and see what's live in the ReThread catalog.</p>
+  </header>
+
+  <main class="max-w-[1100px] mx-auto px-6 sm:px-8 pb-24">
+
+    <!-- Gate states -->
+    <div id="portal-loading" class="panel p-8 text-center text-[#6b6459]">Checking your account…</div>
+
+    <div id="portal-signed-out" class="panel p-8 text-center flex flex-col items-center gap-4" hidden>
+      <p class="text-[1.05rem]">Sign in to access the Brand Portal.</p>
+      <a href="auth.html" class="btn btn-primary">Sign In</a>
+    </div>
+
+    <div id="portal-no-brand" class="panel p-8 sm:p-10 text-center flex flex-col items-center gap-3" hidden>
+      <span class="text-3xl mb-1">🏷️</span>
+      <p class="text-[1.15rem] font-display">Your account isn't linked to a brand yet</p>
+      <p class="text-[0.92rem] text-[#6b6459] max-w-[46ch]">Every Brand Portal account has to be linked by a ReThread admin first — it's a one-line database step that keeps each brand's catalog private to their own team.</p>
+
+      <div class="surface-card rounded-xl p-4 max-w-[46ch] text-left text-[0.85rem] mt-2">
+        <p class="font-semibold m-0 mb-1">Fastest way to see this page working</p>
+        <p class="m-0">Sign out and sign back in with the <strong>demo account</strong> on the sign-in page (<code class="bg-ink/5 px-1 py-0.5 rounded">demo@rethread.app</code>) — it's already linked to a demo brand.</p>
+      </div>
+
+      <a href="mailto:partners@rethread.example?subject=Brand%20Portal%20access%20request" class="btn btn-primary mt-2">Request Brand Portal access</a>
+      <p class="text-[0.78rem] text-[#8a8378] max-w-[46ch] mt-1">Already an admin? Link the account yourself — see <code class="bg-ink/5 px-1.5 py-0.5 rounded text-[0.8rem]">supabase-migrations/002_brand_portal.sql</code> for the exact SQL, or the demo-account setup in <code class="bg-ink/5 px-1.5 py-0.5 rounded text-[0.8rem]">SETUP.md</code>.</p>
+    </div>
+
+    <!-- Main dashboard -->
+    <div id="portal-dashboard" hidden>
+
+      <div class="flex flex-wrap items-center justify-between gap-4 mb-6">
+        <div class="field-group max-w-[280px]" id="brand-switcher-wrap" hidden>
+          <span class="field-label">Managing brand</span>
+          <select id="brand-switcher" class="field-select"></select>
+        </div>
+        <span id="brand-name-static" class="font-display text-[1.3rem]" hidden></span>
+        <button id="new-product-btn" class="btn btn-primary">+ Add Product</button>
+      </div>
+
+      <!-- Existing products -->
+      <section class="mb-14">
+        <h2 class="font-display text-[1.3rem] mb-4">Your products</h2>
+        <p id="products-status" class="text-[0.9rem] text-[#4a443c] mb-4">Loading…</p>
+        <div id="products-list" class="flex flex-col gap-3"></div>
+      </section>
+
+      <!-- Orders & fulfillment tracking -->
+      <section class="mb-14">
+        <h2 class="font-display text-[1.3rem] mb-4">Orders &amp; fulfillment</h2>
+
+        <div id="fulfillment-stats" class="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-5" hidden>
+          <div class="surface-card rounded-xl p-4 text-center">
+            <p class="text-[1.5rem] font-display m-0" id="stat-sold">0</p>
+            <p class="text-[0.78rem] text-[#6b6459] m-0">Units sold</p>
+          </div>
+          <div class="surface-card rounded-xl p-4 text-center">
+            <p class="text-[1.5rem] font-display m-0" id="stat-ordered">0</p>
+            <p class="text-[0.78rem] text-[#6b6459] m-0">Ordered</p>
+          </div>
+          <div class="surface-card rounded-xl p-4 text-center">
+            <p class="text-[1.5rem] font-display m-0" id="stat-shipped">0</p>
+            <p class="text-[0.78rem] text-[#6b6459] m-0">Shipped</p>
+          </div>
+          <div class="surface-card rounded-xl p-4 text-center">
+            <p class="text-[1.5rem] font-display m-0" id="stat-out">0</p>
+            <p class="text-[0.78rem] text-[#6b6459] m-0">Out for delivery</p>
+          </div>
+          <div class="surface-card rounded-xl p-4 text-center">
+            <p class="text-[1.5rem] font-display m-0" id="stat-delivered">0</p>
+            <p class="text-[0.78rem] text-[#6b6459] m-0">Delivered</p>
+          </div>
+        </div>
+
+        <p id="fulfillment-status" class="text-[0.9rem] text-[#4a443c] mb-4">Loading…</p>
+        <div id="fulfillment-list" class="flex flex-col gap-3"></div>
+      </section>
+
+      <!-- Add product form -->
+      <section id="new-product-section" class="panel p-7 sm:p-9" hidden>
+        <div class="flex items-center justify-between mb-6">
+          <h2 class="font-display text-[1.4rem]">Add a new product</h2>
+          <button type="button" id="close-form-btn" class="btn-ghost btn-sm rounded-md">Cancel</button>
+        </div>
+
+        <form id="product-form" class="flex flex-col gap-8">
+
+          <!-- Basics -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
+            <div class="field-group sm:col-span-2">
+              <label for="p-name" class="field-label">Product name</label>
+              <input id="p-name" required class="field-input" placeholder="e.g. Organic Cotton Relaxed Shirt" />
+            </div>
+
+            <div class="field-group">
+              <label for="p-category" class="field-label">Category</label>
+              <select id="p-category" required class="field-select">
+                <option value="">Select a category…</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="p-condition" class="field-label">Condition</label>
+              <select id="p-condition" class="field-select">
+                <option value="new" selected>New</option>
+                <option value="like_new">Like new (refurbished)</option>
+                <option value="good">Good (resale)</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label for="p-mrp" class="field-label">MRP (₹)</label>
+              <input id="p-mrp" type="number" min="0" step="1" required class="field-input" placeholder="899" />
+              <span class="field-hint">Most ReThread shoppers buy in the ₹300–₹1500 range — price for everyday buyers, not luxury retail.</span>
+            </div>
+
+            <div class="field-group">
+              <label for="p-price" class="field-label">Selling price (₹)</label>
+              <input id="p-price" type="number" min="0" step="1" required class="field-input" placeholder="399" />
+              <span class="field-hint" id="discount-preview"></span>
+            </div>
+
+            <div class="field-group sm:col-span-2">
+              <label for="p-description" class="field-label">Description</label>
+              <textarea id="p-description" rows="3" class="field-textarea" placeholder="A relaxed-fit shirt in breathable organic cotton…"></textarea>
+            </div>
+
+            <div class="field-group sm:col-span-2">
+              <label for="p-highlights" class="field-label">Highlights (one per line)</label>
+              <textarea id="p-highlights" rows="3" class="field-textarea" placeholder="100% organic cotton&#10;Relaxed fit&#10;Machine washable"></textarea>
+            </div>
+          </div>
+
+          <!-- Images -->
+          <div>
+            <h3 class="font-semibold text-[0.95rem] mb-3">Images</h3>
+            <div id="image-list" class="flex flex-wrap gap-3 mb-4"></div>
+            <div class="flex flex-wrap gap-3 items-center">
+              <label class="btn btn-secondary btn-sm cursor-pointer">
+                Upload photo
+                <input type="file" id="image-file-input" accept="image/*" class="hidden" hidden />
+              </label>
+              <span class="text-[0.8rem] text-[#8a8378]">or</span>
+              <input type="url" id="image-url-input" placeholder="Paste an image URL" class="field-input flex-1 min-w-[220px]" />
+              <button type="button" id="add-image-url-btn" class="btn btn-secondary btn-sm">Add URL</button>
+            </div>
+            <p class="field-hint" id="image-upload-status"></p>
+          </div>
+
+          <!-- Variants -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-[0.95rem]">Sizes &amp; stock (optional)</h3>
+              <button type="button" id="add-variant-btn" class="btn-ghost btn-sm rounded-md">+ Add row</button>
+            </div>
+            <div id="variant-rows" class="flex flex-col gap-2"></div>
+            <p class="field-hint">Leave empty if this product doesn't have size/color variants.</p>
+          </div>
+
+          <!-- Specifications -->
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="font-semibold text-[0.95rem]">Specifications (optional)</h3>
+              <button type="button" id="add-spec-btn" class="btn-ghost btn-sm rounded-md">+ Add row</button>
+            </div>
+            <div id="spec-rows" class="flex flex-col gap-2"></div>
+          </div>
+
+          <div class="flex items-center gap-4">
+            <button type="submit" class="btn btn-primary" id="product-submit-btn">Publish Product</button>
+            <div id="product-form-status" class="min-h-[1.2em]"></div>
+          </div>
+
+        </form>
+      </section>
+    </div>
+
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "auth.html";
+    window.ACCOUNT_HREF = "account.html";
+    window.BRAND_HREF = "brand-portal.html";
+    window.HOME_HREF = "../index.html";
+  </script>
+  <script src="../auth-utils.js"></script>
+  <script src="brand-portal.js"></script>
+</body>
+</html>

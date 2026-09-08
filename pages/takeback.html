@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sell Your Clothes — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="catalog.html">Shop New</a>
+        <a class="nav-link" href="takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="circle.html">ReThread Circle</a>
+        <a class="nav-link" href="brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <header class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-12 pb-6">
+    <span class="badge badge-moss mb-4">Cash, credit, or a voucher</span>
+    <h1 class="font-display font-medium text-[2.25rem] mb-4 mt-2">Sell Your Clothes</h1>
+    <p class="text-[1.1rem] max-w-[46ch] text-[#4a443c]">Tell us what you're done with. We'll grade it for resale, refurbishing, upcycling, or recycling, and pay out in cash, credit, or a voucher.</p>
+
+    <div class="flex flex-wrap gap-6 mt-7 pt-6 border-t border-ink/[0.12] text-[0.85rem]">
+      <div><span class="block font-display text-[1.35rem] text-indigo">2–4 days</span><span class="text-[#6b6459]">Average grading turnaround</span></div>
+      <div><span class="block font-display text-[1.35rem] text-rust">Free</span><span class="text-[#6b6459]">Pickup on orders of 3+ items</span></div>
+      <div><span class="block font-display text-[1.35rem] text-moss">100%</span><span class="text-[#6b6459]">Kept out of landfill — resold, refurbished, or remade</span></div>
+    </div>
+  </header>
+
+  <main class="max-w-[640px] mx-auto px-6 sm:px-8 pt-4 pb-20">
+
+    <!-- Success screen (hidden until submit) -->
+    <div id="success-panel" class="panel p-8 sm:p-10 text-center" hidden>
+      <div class="w-14 h-14 rounded-full bg-moss/15 text-moss flex items-center justify-center text-[1.8rem] mx-auto mb-5">✓</div>
+      <p class="font-display text-[1.6rem] mb-2">Thanks — we've got it.</p>
+      <p class="text-[#4a443c] mb-1">Reference number</p>
+      <p class="font-display text-[1.3rem] text-indigo mb-6" id="reference-number">—</p>
+
+      <div class="text-left surface-card rounded-xl p-5 mb-7">
+        <p class="font-semibold text-[0.9rem] mb-3">What happens next</p>
+        <ol class="list-none m-0 p-0 flex flex-col gap-3 text-[0.88rem]">
+          <li class="flex gap-3"><span class="step-badge">1</span><span>We confirm your <span id="success-mode">drop-off</span> details by email or SMS within 24 hours.</span></li>
+          <li class="flex gap-3"><span class="step-badge">2</span><span>Your item is graded against the condition you reported.</span></li>
+          <li class="flex gap-3"><span class="step-badge">3</span><span>Payout is released to your account as cash, credit, or a voucher.</span></li>
+        </ol>
+      </div>
+
+      <div class="flex flex-wrap justify-center gap-3">
+        <button type="button" id="submit-another-btn" class="btn btn-secondary">Submit another item</button>
+        <a href="../index.html" class="btn btn-primary">Back to home</a>
+      </div>
+    </div>
+
+    <form id="takeback-form" class="panel p-7 sm:p-9 flex flex-col gap-7">
+
+      <!-- Section 1: item -->
+      <div class="flex flex-col gap-5">
+        <p class="flex items-center gap-2.5 font-display text-[1.1rem] m-0"><span class="step-badge">1</span> What are you sending in?</p>
+
+        <div class="field-group">
+          <label for="item_category" class="field-label">Category</label>
+          <select id="item_category" required class="field-select">
+            <option value="">Select a category…</option>
+            <option>Jeans</option>
+            <option>T-Shirts</option>
+            <option>Shirts</option>
+            <option>Trousers</option>
+            <option>Jackets</option>
+            <option>Dresses</option>
+            <option>Tops</option>
+            <option>Skirts</option>
+            <option>Kurtas</option>
+            <option>Sarees</option>
+            <option>Sneakers</option>
+            <option>Sandals</option>
+            <option>Formal Shoes</option>
+            <option>Boots</option>
+            <option>Belts</option>
+            <option>Bags</option>
+            <option>Other</option>
+          </select>
+        </div>
+
+        <div class="field-group">
+          <label for="material" class="field-label">Material (if known)</label>
+          <input type="text" id="material" placeholder="e.g. Denim, Cotton, Silk" class="field-input" />
+        </div>
+
+        <div class="field-group">
+          <label for="item_description" class="field-label">Tell us a bit about it</label>
+          <textarea id="item_description" rows="3" placeholder="e.g. Straight-fit jeans, slightly faded, one small tear near the pocket" class="field-textarea"></textarea>
+        </div>
+      </div>
+
+      <!-- Section 2: condition + estimate -->
+      <div class="flex flex-col gap-4 pt-6 border-t border-ink/[0.1]">
+        <p class="flex items-center gap-2.5 font-display text-[1.1rem] m-0"><span class="step-badge">2</span> Condition</p>
+
+        <div class="field-group">
+          <div class="flex items-baseline justify-between">
+            <label for="condition_reported" class="field-label mb-0">How would you describe its condition?</label>
+            <button type="button" id="condition-guide-toggle" class="text-[0.8rem] text-indigo font-medium hover:underline bg-transparent border-0 cursor-pointer p-0">What do these mean?</button>
+          </div>
+          <select id="condition_reported" required class="field-select">
+            <option value="like_new">Like new — worn a handful of times, no flaws</option>
+            <option value="good" selected>Good — some wear, fully wearable</option>
+            <option value="fair">Fair — visible wear, small flaws or repairs needed</option>
+            <option value="worn_out">Worn out — heavily used, better for recycling</option>
+          </select>
+        </div>
+
+        <div id="condition-guide" class="surface-card rounded-xl p-4 text-[0.85rem] flex flex-col gap-2.5" hidden>
+          <p class="m-0"><strong>Like new</strong> — No stains, tears, or pilling. Looks close to how it did on day one.</p>
+          <p class="m-0"><strong>Good</strong> — Normal signs of wear (light fading, minor pilling). No holes or stains.</p>
+          <p class="m-0"><strong>Fair</strong> — Visible wear: a loose button, a small tear, a faint stain — still usable.</p>
+          <p class="m-0"><strong>Worn out</strong> — Heavily worn or damaged. Great for our recycling stream, not resale.</p>
+        </div>
+
+        <div class="rounded-xl bg-moss/10 border border-moss/20 p-4 flex items-center justify-between gap-4">
+          <div>
+            <p class="text-[0.78rem] uppercase tracking-wide font-semibold text-moss m-0 mb-0.5">Instant estimate</p>
+            <p class="font-display text-[1.4rem] m-0" id="estimate-range">Pick a category to see one</p>
+          </div>
+          <span class="text-[0.75rem] text-[#6b6459] max-w-[130px] text-right">Confirmed after we physically grade the item</span>
+        </div>
+      </div>
+
+      <!-- Section 3: photos (required) -->
+      <div class="flex flex-col gap-3 pt-6 border-t border-ink/[0.1]">
+        <p class="flex items-center gap-2.5 font-display text-[1.1rem] m-0"><span class="step-badge">3</span> Photos <span class="badge badge-rust">Required</span></p>
+        <p class="text-[0.85rem] text-[#4a443c] -mt-1">Add at least 1 photo (up to 5). Clear, well-lit shots get graded faster and more accurately.</p>
+
+        <label id="dropzone" for="photo-input" class="flex flex-col items-center justify-center gap-2 text-center border-2 border-dashed border-ink/25 rounded-xl py-8 px-4 cursor-pointer transition-colors hover:border-indigo hover:bg-indigo/5">
+          <span class="text-[1.6rem]" aria-hidden="true">📷</span>
+          <span class="text-[0.9rem] font-semibold">Tap to add photos</span>
+          <span class="text-[0.78rem] text-[#6b6459]">or drag and drop — JPG or PNG, up to 8MB each</span>
+        </label>
+        <input type="file" id="photo-input" accept="image/png, image/jpeg, image/webp" multiple hidden />
+
+        <div id="photo-previews" class="grid grid-cols-3 sm:grid-cols-5 gap-2.5"></div>
+        <p id="photo-status" class="field-hint m-0"></p>
+      </div>
+
+      <!-- Section 4: pickup / dropoff -->
+      <div class="flex flex-col gap-4 pt-6 border-t border-ink/[0.1]">
+        <p class="flex items-center gap-2.5 font-display text-[1.1rem] m-0"><span class="step-badge">4</span> How should we get it?</p>
+
+        <div class="flex gap-6">
+          <label class="flex items-center gap-1.5 font-normal text-[0.92rem]"><input type="radio" name="pickup_or_dropoff" value="dropoff" checked /> Drop it off</label>
+          <label class="flex items-center gap-1.5 font-normal text-[0.92rem]"><input type="radio" name="pickup_or_dropoff" value="pickup" /> Request a pickup</label>
+        </div>
+
+        <div id="pickup-fields" class="flex flex-col gap-4" hidden>
+          <div class="field-group">
+            <label for="pickup_date" class="field-label">Preferred pickup date</label>
+            <input type="date" id="pickup_date" class="field-input" />
+          </div>
+          <div class="field-group">
+            <label for="pickup_address" class="field-label">Pickup address</label>
+            <textarea id="pickup_address" rows="2" placeholder="Flat / house no., street, area, city, PIN code" class="field-textarea"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 5: contact -->
+      <div class="flex flex-col gap-5 pt-6 border-t border-ink/[0.1]">
+        <p class="flex items-center gap-2.5 font-display text-[1.1rem] m-0"><span class="step-badge">5</span> Your details</p>
+
+        <div class="field-group">
+          <label for="contact_name" class="field-label">Your name</label>
+          <input type="text" id="contact_name" required class="field-input" />
+        </div>
+
+        <div class="field-group">
+          <label for="contact_email" class="field-label">Email</label>
+          <input type="email" id="contact_email" class="field-input" />
+        </div>
+
+        <div class="field-group">
+          <label for="contact_phone" class="field-label">Phone</label>
+          <input type="tel" id="contact_phone" placeholder="10-digit mobile number" class="field-input" />
+        </div>
+
+        <p class="field-hint -mt-2">We'll need at least an email or a phone number to get back to you.</p>
+      </div>
+
+      <label class="flex items-start gap-2.5 text-[0.85rem] text-[#4a443c] pt-2">
+        <input type="checkbox" id="terms_accepted" required class="mt-0.5" />
+        <span>This item is clean and accurately described, and I agree to ReThread's take-back terms.</span>
+      </label>
+
+      <button type="submit" class="btn btn-primary self-start" id="submit-btn">Submit for grading</button>
+
+      <p id="form-status" role="status" class="text-[0.9rem] min-h-[1.2em] m-0"></p>
+
+    </form>
+
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "auth.html";
+    window.ACCOUNT_HREF = "account.html";
+    window.BRAND_HREF = "brand-portal.html";
+    window.HOME_HREF = "../index.html";
+  </script>
+  <script src="../auth-utils.js"></script>
+  <script src="takeback.js"></script>
+</body>
+</html>

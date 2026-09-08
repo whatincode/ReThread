@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <!-- Razorpay's hosted Checkout widget (opens the card/UPI/wallet popup) -->
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+      <span class="text-[0.85rem] text-[#6b6459]">🔒 Secure checkout</span>
+    </div>
+  </nav>
+
+  <main class="max-w-[900px] mx-auto px-6 sm:px-8 pt-10 pb-24">
+    <h1 class="font-display font-medium text-[2rem] mb-8">Checkout</h1>
+
+    <div id="checkout-signed-out" class="panel p-8 text-center flex flex-col items-center gap-4" hidden>
+      <p class="text-[1.05rem]">Sign in to complete your order.</p>
+      <a href="auth.html" class="btn btn-primary">Sign In</a>
+    </div>
+
+    <div id="checkout-empty" class="panel p-8 text-center flex flex-col items-center gap-4" hidden>
+      <p class="text-[1.05rem]">Your bag is empty.</p>
+      <a href="catalog.html" class="btn btn-primary">Shop New</a>
+    </div>
+
+    <div id="checkout-content" class="grid grid-cols-1 md:grid-cols-[1fr_360px] gap-10 items-start" hidden>
+
+      <!-- Shipping details -->
+      <section class="panel p-6 sm:p-8">
+        <div class="flex items-center gap-2.5 mb-6">
+          <span class="step-badge">1</span>
+          <h2 class="font-display text-[1.2rem]">Shipping details</h2>
+        </div>
+        <form id="shipping-form" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="field-group">
+              <label for="ship-name" class="field-label">Full name</label>
+              <input id="ship-name" required class="field-input" placeholder="Ada Lovelace" />
+            </div>
+            <div class="field-group">
+              <label for="ship-phone" class="field-label">Phone</label>
+              <input id="ship-phone" required class="field-input" placeholder="10-digit mobile number" />
+            </div>
+          </div>
+          <div class="field-group">
+            <label for="ship-address1" class="field-label">Address</label>
+            <input id="ship-address1" required class="field-input" placeholder="House / flat, street" />
+          </div>
+          <div class="field-group">
+            <label for="ship-address2" class="field-label">Landmark / area (optional)</label>
+            <input id="ship-address2" class="field-input" />
+          </div>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-4">
+            <div class="field-group">
+              <label for="ship-city" class="field-label">City</label>
+              <input id="ship-city" required class="field-input" />
+            </div>
+            <div class="field-group">
+              <label for="ship-state" class="field-label">State</label>
+              <input id="ship-state" required class="field-input" />
+            </div>
+            <div class="field-group">
+              <label for="ship-postal" class="field-label">PIN code</label>
+              <input id="ship-postal" required class="field-input" />
+            </div>
+          </div>
+        </form>
+
+        <div class="flex items-center gap-2.5 mt-9 mb-4">
+          <span class="step-badge">2</span>
+          <h2 class="font-display text-[1.2rem]">Payment</h2>
+        </div>
+        <p class="text-[0.88rem] text-[#6b6459] mb-4">Cards, UPI, netbanking, and wallets — handled by Razorpay's secure checkout. ReThread never sees or stores your card/UPI details.</p>
+        <div class="flex flex-wrap gap-2.5 mb-6">
+          <span class="pay-method-btn">💳 Cards</span>
+          <span class="pay-method-btn">📱 UPI</span>
+          <span class="pay-method-btn">🏦 Netbanking</span>
+          <span class="pay-method-btn">👛 Wallets</span>
+        </div>
+
+        <button type="button" id="pay-btn" class="btn btn-primary btn-block">Pay <span id="pay-btn-amount"></span></button>
+        <div id="checkout-status" class="min-h-[1.2em] mt-3"></div>
+      </section>
+
+      <!-- Order summary -->
+      <aside class="panel p-6 sm:p-7 md:sticky md:top-24">
+        <h2 class="font-display text-[1.1rem] mb-4">Order summary</h2>
+        <div id="summary-items" class="flex flex-col gap-4 mb-5"></div>
+        <div class="pt-4 border-t border-ink/12 flex flex-col gap-2 text-[0.92rem]">
+          <div class="flex justify-between"><span>Subtotal</span><span id="summary-subtotal"></span></div>
+          <div class="flex justify-between text-[#6b6459]"><span>Shipping</span><span>Free</span></div>
+          <div class="flex justify-between font-semibold text-[1.05rem] pt-2 border-t border-ink/12 mt-1"><span>Total</span><span id="summary-total"></span></div>
+        </div>
+      </aside>
+
+    </div>
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.SUPABASE_FUNCTIONS_URL = "https://sgknpybkaombhaqywsqf.functions.supabase.co";
+  </script>
+  <script src="checkout.js"></script>
+</body>
+</html>

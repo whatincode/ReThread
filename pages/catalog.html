@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shop New — ReThread</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="../tailwind-config.js"></script>
+  <link rel="stylesheet" href="../base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="../index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="catalog.html">Shop New</a>
+        <a class="nav-link" href="takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="circle.html">ReThread Circle</a>
+        <a class="nav-link" href="brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <header class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-12 pb-6">
+    <h1 class="font-display font-medium text-[2.25rem] mb-3">Shop New</h1>
+    <p class="text-[1.1rem] max-w-[46ch] text-[#4a443c]">New arrivals from our label and partner brands.</p>
+  </header>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pb-8 flex flex-wrap gap-5 border-b border-ink/[0.12]">
+    <label class="field-group text-[0.85rem] font-medium">
+      <span>Category</span>
+      <select id="filter-category" class="field-select min-w-[180px]">
+        <option value="">All categories</option>
+      </select>
+    </label>
+
+    <label class="field-group text-[0.85rem] font-medium">
+      <span>Brand</span>
+      <select id="filter-brand" class="field-select min-w-[180px]">
+        <option value="">All brands</option>
+      </select>
+    </label>
+
+    <label class="field-group text-[0.85rem] font-medium">
+      <span>Sort by</span>
+      <select id="sort-by" class="field-select min-w-[180px]">
+        <option value="default">Featured</option>
+        <option value="price-asc">Price: Low to High</option>
+        <option value="price-desc">Price: High to Low</option>
+        <option value="rating-desc">Highest Rated</option>
+      </select>
+    </label>
+  </section>
+
+  <main class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-8 pb-20">
+    <p id="catalog-status" class="mb-6 text-[0.9rem] text-[#4a443c]">Loading products…</p>
+    <div id="product-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"></div>
+  </main>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-8 flex justify-between text-[0.85rem] text-[#6b6459] border-t border-ink/[0.12]">
+    <span>ReThread</span>
+    <span>Buy New. Trade Old. Wear Circular.</span>
+  </footer>
+
+  <script src="../cart-utils.js"></script>
+  <script src="../supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "auth.html";
+    window.ACCOUNT_HREF = "account.html";
+    window.BRAND_HREF = "brand-portal.html";
+    window.HOME_HREF = "../index.html";
+  </script>
+  <script src="../auth-utils.js"></script>
+  <script src="catalog.js"></script>
+</body>
+</html>
