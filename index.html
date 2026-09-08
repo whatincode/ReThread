@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ReThread — Buy New. Trade Old. Wear Circular.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="tailwind-config.js"></script>
+  <link rel="stylesheet" href="base.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="m-0 font-body text-ink bg-cotton leading-relaxed">
+
+  <nav class="sticky top-0 z-40 bg-cotton/95 backdrop-blur border-b border-ink/10">
+    <div class="max-w-[1100px] mx-auto px-6 sm:px-8 py-3.5 flex items-center justify-between gap-3">
+      <a href="index.html" class="flex items-center gap-2.5 font-display text-[1.3rem] font-semibold shrink-0">
+        <span class="w-8 h-8 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.9rem] font-body font-bold">R</span>
+        ReThread
+      </a>
+
+      <div class="hidden lg:flex flex-wrap items-center gap-5 sm:gap-7 text-[0.92rem]">
+        <a class="nav-link" href="pages/catalog.html">Shop New</a>
+        <a class="nav-link" href="pages/takeback.html">Sell Your Clothes</a>
+        <a class="nav-link" href="pages/circle.html">ReThread Circle</a>
+        <a class="nav-link" href="pages/brand-portal.html">Brand Portal</a>
+        <a class="nav-link flex items-center gap-1.5" href="pages/cart.html">
+          Bag <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <span id="auth-status"></span>
+      </div>
+
+      <div class="flex items-center gap-1 lg:hidden">
+        <a class="nav-link flex items-center gap-1 px-2 py-1.5" href="pages/cart.html" aria-label="Your bag">
+          <span aria-hidden="true">🛍️</span> <span class="cart-count-badge text-rust font-semibold"></span>
+        </a>
+        <button id="hamburger-btn" type="button" class="hamburger-btn" aria-label="Open menu" aria-expanded="false">
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+          <span class="hamburger-line"></span>
+        </button>
+      </div>
+    </div>
+
+    <div id="mobile-menu" hidden class="lg:hidden border-t border-ink/10 bg-cotton px-6 sm:px-8 py-3 animate-fade-up">
+      <a class="mobile-nav-link" href="pages/catalog.html">Shop New</a>
+      <a class="mobile-nav-link" href="pages/takeback.html">Sell Your Clothes</a>
+      <a class="mobile-nav-link" href="pages/circle.html">ReThread Circle</a>
+      <a class="mobile-nav-link" href="pages/brand-portal.html">Brand Portal</a>
+      <div id="auth-status-mobile" class="pt-3 mt-1 flex flex-col gap-2"></div>
+    </div>
+  </nav>
+
+  <header class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-14 sm:pt-16 pb-16 relative">
+    <div class="hidden md:grid grid-cols-3 gap-3 absolute right-6 sm:right-8 top-14 w-[300px] lg:w-[360px]" aria-hidden="true">
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center -rotate-6" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMmRhYzgiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTEyMCw3MCBMOTUsOTAgTDcwLDExNSBMOTIsMTM4IEwxMTAsMTIyIEwxMTAsMjM1IEwxOTAsMjM1IEwxOTAsMTIyIEwyMDgsMTM4IEwyMzAsMTE1IEwyMDUsOTAgTDE4MCw3MCBRMTUwLDkwIDEyMCw3MCBaIiBmaWxsPSIjYjY1YTM0IiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPjxwYXRoIGQ9Ik0xMjgsNzIgUTE1MCw5NSAxNzIsNzIiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzFlMWExNiIgc3Ryb2tlLXdpZHRoPSIzIi8+Cjwvc3ZnPg==')"></div>
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center rotate-3" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMmRhYzgiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTEyNCw2NCBMMTA4LDg0IEw5NiwxMDQgTDExMiwxMjAgTDEyMiwxMTAgTDExMiwxNjAgTDg0LDIzNiBMMjE2LDIzNiBMMTg4LDE2MCBMMTc4LDExMCBMMTg4LDEyMCBMMjA0LDEwNCBMMTkyLDg0IEwxNzYsNjQgUTE1MCw4NCAxMjQsNjQgWiIgZmlsbD0iIzhhNmE0ZiIgc3Ryb2tlPSIjMWUxYTE2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48cGF0aCBkPSJNMTMyLDY2IFExNTAsODggMTY4LDY2IiBmaWxsPSJub25lIiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMyIvPjxwYXRoIGQ9Ik0xMTgsMTYwIEwxODIsMTYwIiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMyA1Ii8+Cjwvc3ZnPg==')"></div>
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center -rotate-2" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMmRhYzgiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTExMiw2NiBMODIsODggTDYwLDExOCBMODQsMTQyIEwxMDQsMTI0IEwxMDAsMjM2IEwyMDAsMjM2IEwxOTYsMTI0IEwyMTYsMTQyIEwyNDAsMTE4IEwyMTgsODggTDE4OCw2NiBMMTUwLDg4IFoiIGZpbGw9IiNiNjVhMzQiIHN0cm9rZT0iIzFlMWExNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PGxpbmUgeDE9IjE1MCIgeTE9Ijg4IiB4Mj0iMTUwIiB5Mj0iMjM0IiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMiIgc3Ryb2tlLWRhc2hhcnJheT0iMiA1Ii8+PHBhdGggZD0iTTE1MCw4OCBMMTMyLDExMCBMMTUwLDEyNCBMMTY4LDExMCBaIiBmaWxsPSIjZmRmYmY2IiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMiIvPgo8L3N2Zz4=')"></div>
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center rotate-6" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlN2RmY2UiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTU1LDE5MCBRNjAsMTUwIDEwMCwxNDAgTDE1MCwxMjAgUTE2OCwxMTIgMTgyLDEyNCBMMjI4LDE1MCBRMjQ2LDE1OCAyNDYsMTc4IEwyNDYsMTk2IFEyNDYsMjA2IDIzNiwyMDYgTDY0LDIwNiBRNTUsMjA2IDU1LDE5NiBaIiBmaWxsPSIjMmIzYTU1IiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMyIgc3Ryb2tlLWxpbmVqb2luPSJyb3VuZCIvPgo8cGF0aCBkPSJNMTAwLDE0MCBRMTMwLDE1MCAxNTAsMTUwIEwxODIsMTI0IiBmaWxsPSJub25lIiBzdHJva2U9IiMxZTFhMTYiIHN0cm9rZS13aWR0aD0iMi41Ii8+CjxwYXRoIGQ9Ik02NCwyMDYgTDIzNiwyMDYgTDIzNiwyMTggUTIzNiwyMjQgMjI4LDIyNCBMNzIsMjI0IFE2NCwyMjQgNjQsMjE4IFoiIGZpbGw9IiNmZGZiZjYiIHN0cm9rZT0iIzFlMWExNiIgc3Ryb2tlLXdpZHRoPSIyLjUiLz4KPGNpcmNsZSBjeD0iMTIwIiBjeT0iMTUwIiByPSIyIiBmaWxsPSIjMWUxYTE2Ii8+PGNpcmNsZSBjeD0iMTM1IiBjeT0iMTQ1IiByPSIyIiBmaWxsPSIjMWUxYTE2Ii8+PGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQxIiByPSIyIiBmaWxsPSIjMWUxYTE2Ii8+Cjwvc3ZnPg==')"></div>
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center -rotate-3" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMGQ2YzIiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTEyMCw2MiBMOTQsODQgTDcyLDExMCBMOTIsMTMyIEwxMDgsMTE4IEw5OCwxNTAgTDkyLDIzNiBMMTE4LDIzNiBMMTI0LDE4MCBMMTUwLDE4MCBMMTc2LDE4MCBMMTgyLDIzNiBMMjA4LDIzNiBMMjAyLDE1MCBMMTkyLDExOCBMMjA4LDEzMiBMMjI4LDExMCBMMjA2LDg0IEwxODAsNjIgUTE1MCw4NiAxMjAsNjIgWiIgZmlsbD0iI2M5OGE0YiIgc3Ryb2tlPSIjMWUxYTE2IiBzdHJva2Utd2lkdGg9IjMiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48bGluZSB4MT0iMTUwIiB5MT0iNzAiIHgyPSIxNTAiIHkyPSIxNzYiIHN0cm9rZT0iIzFlMWExNiIgc3Ryb2tlLXdpZHRoPSIyIiBzdHJva2UtZGFzaGFycmF5PSIyIDUiLz48Y2lyY2xlIGN4PSIxNTAiIGN5PSI5MCIgcj0iMi4yIiBmaWxsPSIjMWUxYTE2Ii8+PGNpcmNsZSBjeD0iMTUwIiBjeT0iMTA2IiByPSIyLjIiIGZpbGw9IiMxZTFhMTYiLz48Y2lyY2xlIGN4PSIxNTAiIGN5PSIxMjIiIHI9IjIuMiIgZmlsbD0iIzFlMWExNiIvPgo8L3N2Zz4=')"></div>
+      <div class="aspect-square rounded-[10px] border border-ink/10 shadow-card bg-cover bg-center rotate-2" style="background-image:url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMDAgMzAwIj4KPHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbGw9IiNlMGQ2YzIiLz4KPGNpcmNsZSBjeD0iMTUwIiBjeT0iMTQ1IiByPSIxMDgiIGZpbGw9IiNmZGZiZjYiIG9wYWNpdHk9IjAuNTUiLz4KPHBhdGggZD0iTTkwLDEyMCBMMjEwLDEyMCBMMjIyLDIzNiBMNzgsMjM2IFoiIGZpbGw9IiM1YzZlNGEiIHN0cm9rZT0iIzFlMWExNiIgc3Ryb2tlLXdpZHRoPSIzIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+CjxwYXRoIGQ9Ik0xMTIsMTIwIFExMTIsODAgMTUwLDgwIFExODgsODAgMTg4LDEyMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjMWUxYTE2IiBzdHJva2Utd2lkdGg9IjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPgo8Y2lyY2xlIGN4PSIxNTAiIGN5PSIxNzAiIHI9IjE0IiBmaWxsPSJub25lIiBzdHJva2U9IiNmZGZiZjYiIHN0cm9rZS13aWR0aD0iMyIvPgo8L3N2Zz4=')"></div>
+    </div>
+    <div class="max-w-[620px]">
+      <span class="badge badge-moss mb-5">♻ Circular fashion, done properly</span>
+      <h1 class="font-display font-medium text-[clamp(2.75rem,6vw,4.5rem)] leading-[1.04] mb-6 mt-4 tracking-[-0.01em]">
+        Buy new.<br>Trade old.<br>Wear circular.
+      </h1>
+      <p class="text-[1.15rem] max-w-[46ch] text-[#4a443c] mb-8">
+        A clothing marketplace with a second life built in. Shop new arrivals,
+        send in what you're done with, and see it come back as something else entirely.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="pages/catalog.html" class="btn btn-primary">Shop New Arrivals</a>
+        <a href="pages/takeback.html" class="btn btn-secondary">Sell Your Clothes</a>
+      </div>
+      <p class="text-[0.85rem] text-[#6b6459] mt-4">New here? <a href="pages/auth.html" class="text-indigo font-semibold hover:underline">Try the demo account</a> — no email confirmation needed.</p>
+    </div>
+    <div class="mt-12 h-0 border-t-2 border-dashed border-indigo opacity-55" aria-hidden="true"></div>
+  </header>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pb-16 flex flex-wrap gap-x-10 gap-y-5 text-[0.88rem]">
+    <div><span class="block font-display text-[1.5rem] text-rust">₹299+</span><span class="text-[#6b6459]">Everyday prices, not luxury retail</span></div>
+    <div><span class="block font-display text-[1.5rem] text-indigo">18,600+</span><span class="text-[#6b6459]">Garments taken back so far</span></div>
+    <div><span class="block font-display text-[1.5rem] text-moss">3</span><span class="text-[#6b6459]">Partner brands and counting</span></div>
+    <div><span class="block font-display text-[1.5rem]">4.6★</span><span class="text-[#6b6459]">Average rating from customers</span></div>
+  </section>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-4 pb-16">
+    <p class="font-display text-[1.4rem] mb-8">Three ways in.</p>
+    <div class="flex flex-wrap gap-10">
+
+      <a class="relative surface-card rounded-[4px_14px_4px_14px] pt-7 px-6 pb-6 w-full sm:w-[260px] rotate-0 sm:-rotate-3 transition-transform duration-200 ease-out shadow-card hover:rotate-0 hover:-translate-y-1 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo focus-visible:outline-offset-[3px]" href="pages/catalog.html">
+        <span class="absolute top-3.5 right-[18px] w-3 h-3 rounded-full bg-cotton border-[1.5px] border-ink"></span>
+        <span class="block font-display font-semibold text-[1.2rem] mb-2 pr-6">Shop New</span>
+        <span class="block text-[0.92rem] text-[#4a443c]">Fresh apparel from our label and partner brands.</span>
+      </a>
+
+      <a class="relative surface-card rounded-[4px_14px_4px_14px] pt-7 px-6 pb-6 w-full sm:w-[260px] rotate-0 sm:rotate-2 transition-transform duration-200 ease-out shadow-card hover:rotate-0 hover:-translate-y-1 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo focus-visible:outline-offset-[3px]" href="pages/takeback.html">
+        <span class="absolute top-3.5 right-[18px] w-3 h-3 rounded-full bg-cotton border-[1.5px] border-ink"></span>
+        <span class="block font-display font-semibold text-[1.2rem] mb-2 pr-6 text-rust">Sell Your Clothes</span>
+        <span class="block text-[0.92rem] text-[#4a443c]">Send in what you're not wearing for cash, credit, or a voucher.</span>
+      </a>
+
+      <a class="relative surface-card rounded-[4px_14px_4px_14px] pt-7 px-6 pb-6 w-full sm:w-[260px] rotate-0 sm:rotate-[-1.5deg] transition-transform duration-200 ease-out shadow-card hover:rotate-0 hover:-translate-y-1 hover:shadow-card-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-indigo focus-visible:outline-offset-[3px]" href="pages/circle.html">
+        <span class="absolute top-3.5 right-[18px] w-3 h-3 rounded-full bg-cotton border-[1.5px] border-ink"></span>
+        <span class="block font-display font-semibold text-[1.2rem] mb-2 pr-6 text-moss">ReThread Circle</span>
+        <span class="block text-[0.92rem] text-[#4a443c]">Totes, purses, and more — made from what came back to us.</span>
+      </a>
+
+    </div>
+  </section>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pt-4 pb-20 border-t border-ink/[0.12]">
+    <p class="font-display text-[1.4rem] mb-8">What happens to what you send in</p>
+    <ol class="list-none m-0 p-0 grid grid-cols-2 sm:grid-cols-4 gap-6">
+      <li class="flex flex-col gap-1.5">
+        <span class="font-display text-[1.6rem] text-indigo">1</span>
+        <span class="font-semibold">Collection</span>
+        <span class="text-[0.9rem] text-[#4a443c]">Dropped off or picked up, logged to your account.</span>
+      </li>
+      <li class="flex flex-col gap-1.5">
+        <span class="font-display text-[1.6rem] text-indigo">2</span>
+        <span class="font-semibold">Grading</span>
+        <span class="text-[0.9rem] text-[#4a443c]">Sorted for resale, refurbishing, upcycling, or recycling.</span>
+      </li>
+      <li class="flex flex-col gap-1.5">
+        <span class="font-display text-[1.6rem] text-indigo">3</span>
+        <span class="font-semibold">Payout</span>
+        <span class="text-[0.9rem] text-[#4a443c]">Cash, credit, or a voucher, released to your account.</span>
+      </li>
+      <li class="flex flex-col gap-1.5">
+        <span class="font-display text-[1.6rem] text-indigo">4</span>
+        <span class="font-semibold">Second life</span>
+        <span class="text-[0.9rem] text-[#4a443c]">Resold, refurbished, or remade into something new.</span>
+      </li>
+    </ol>
+  </section>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pb-20">
+    <div class="surface-card rounded-2xl px-8 py-10 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
+      <div>
+        <p class="font-display text-[1.3rem] mb-1.5">Sell on ReThread</p>
+        <p class="text-[0.95rem] text-[#4a443c] max-w-[42ch]">Already a partner brand? Add products, manage your catalog, and track what's live — all from the Brand Portal.</p>
+      </div>
+      <a href="pages/brand-portal.html" class="btn btn-dark shrink-0">Go to Brand Portal</a>
+    </div>
+  </section>
+
+  <section class="max-w-[1100px] mx-auto px-6 sm:px-8 pb-20 border-t border-ink/[0.12] pt-14">
+    <p class="font-display text-[1.4rem] mb-8">What people are saying</p>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
+      <div class="panel p-6">
+        <p class="text-rust tracking-wide mb-2">★★★★★</p>
+        <p class="text-[0.92rem] text-[#3a352e] mb-3">"Sent in a bag of old jeans, had cash in my account within the week. Didn't expect it to be this easy."</p>
+        <p class="text-[0.82rem] text-[#6b6459] font-semibold m-0">— Ritika, Pune</p>
+      </div>
+      <div class="panel p-6">
+        <p class="text-rust tracking-wide mb-2">★★★★★</p>
+        <p class="text-[0.92rem] text-[#3a352e] mb-3">"Actually affordable everyday basics — refreshing after so many 'sustainable' brands charging premium prices."</p>
+        <p class="text-[0.82rem] text-[#6b6459] font-semibold m-0">— Ansh, Bengaluru</p>
+      </div>
+      <div class="panel p-6">
+        <p class="text-rust tracking-wide mb-2">★★★★☆</p>
+        <p class="text-[0.92rem] text-[#3a352e] mb-3">"Bought a tote made from recycled denim on the Circle page — didn't know that program existed, love the idea."</p>
+        <p class="text-[0.82rem] text-[#6b6459] font-semibold m-0">— Meera, Mumbai</p>
+      </div>
+    </div>
+  </section>
+
+  <footer class="max-w-[1100px] mx-auto px-6 sm:px-8 py-10 border-t border-ink/[0.12]">
+    <div class="flex flex-wrap justify-between gap-8 mb-8">
+      <div class="max-w-[280px]">
+        <a href="index.html" class="flex items-center gap-2.5 font-display text-[1.15rem] font-semibold mb-2">
+          <span class="w-7 h-7 rounded-full bg-rust text-cotton flex items-center justify-center text-[0.8rem] font-body font-bold">R</span>
+          ReThread
+        </a>
+        <p class="text-[0.85rem] text-[#6b6459] m-0">A clothing marketplace with a second life built in.</p>
+      </div>
+      <div class="flex flex-wrap gap-10 text-[0.85rem]">
+        <div class="flex flex-col gap-2">
+          <span class="font-semibold text-[0.8rem] uppercase tracking-wide text-[#8a8378] mb-1">Shop</span>
+          <a href="pages/catalog.html" class="text-[#4a443c] hover:text-ink">Shop New</a>
+          <a href="pages/circle.html" class="text-[#4a443c] hover:text-ink">ReThread Circle</a>
+          <a href="pages/cart.html" class="text-[#4a443c] hover:text-ink">Your Bag</a>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="font-semibold text-[0.8rem] uppercase tracking-wide text-[#8a8378] mb-1">Sell</span>
+          <a href="pages/takeback.html" class="text-[#4a443c] hover:text-ink">Sell Your Clothes</a>
+          <a href="pages/brand-portal.html" class="text-[#4a443c] hover:text-ink">Brand Portal</a>
+        </div>
+        <div class="flex flex-col gap-2">
+          <span class="font-semibold text-[0.8rem] uppercase tracking-wide text-[#8a8378] mb-1">Account</span>
+          <a href="pages/auth.html" class="text-[#4a443c] hover:text-ink">Sign In</a>
+          <a href="pages/account.html" class="text-[#4a443c] hover:text-ink">My Account</a>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-wrap justify-between gap-3 pt-6 border-t border-ink/[0.08] text-[0.8rem] text-[#8a8378]">
+      <span>© 2026 ReThread</span>
+      <span>Buy New. Trade Old. Wear Circular.</span>
+    </div>
+  </footer>
+  <script src="cart-utils.js"></script>
+  <script src="supabaseClient.js"></script>
+  <script>
+    window.AUTH_HREF = "pages/auth.html";
+    window.ACCOUNT_HREF = "pages/account.html";
+    window.BRAND_HREF = "pages/brand-portal.html";
+    window.HOME_HREF = "index.html";
+  </script>
+  <script src="auth-utils.js"></script>
+</body>
+</html>

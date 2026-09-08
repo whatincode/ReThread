@@ -1,0 +1,274 @@
+/* ============================================================
+   base.css — NOT a design system anymore (Tailwind handles that).
+   Just the few rules utility classes genuinely can't express:
+   - the [hidden] vs display-class specificity fight
+   - respecting prefers-reduced-motion globally
+   ============================================================ */
+
+[hidden] {
+  display: none !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    transition: none !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Skeleton loading shimmer — used while catalog/product data is fetching */
+.skeleton {
+  background: linear-gradient(90deg, #e2dac8 0%, #ece5d6 50%, #e2dac8 100%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+}
+
+/* Small spinner used inside buttons during async actions */
+.spinner {
+  width: 1em;
+  height: 1em;
+  border: 2px solid rgba(237, 230, 216, 0.4);
+  border-top-color: currentColor;
+  border-radius: 50%;
+  display: inline-block;
+  animation: spin 0.7s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+/* Custom scrollbar for horizontally-scrolling chip rows, dashboards */
+.styled-scroll::-webkit-scrollbar { height: 6px; width: 6px; }
+.styled-scroll::-webkit-scrollbar-thumb { background: rgba(30,26,22,0.2); border-radius: 999px; }
+
+/* ============================================================
+   Small design system layer (plain CSS, not Tailwind @apply,
+   so it works with the Tailwind CDN build with no extra setup).
+   Buttons, inputs, cards, badges, nav links, tabs, banners —
+   the recurring pieces used across every page.
+   ============================================================ */
+
+/* ---- Buttons ---- */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.85rem 1.75rem;
+  border-radius: 9px;
+  border: none;
+  cursor: pointer;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:focus-visible { outline: 2px solid #2b3a55; outline-offset: 2px; }
+.btn:disabled { opacity: 0.55; cursor: not-allowed; transform: none; box-shadow: none; }
+
+.btn-primary { background: #b65a34; color: #fdfbf6; box-shadow: 0 1px 2px rgba(30, 26, 22, 0.18); }
+.btn-primary:hover:not(:disabled) { background: #a34e2b; box-shadow: 0 8px 20px -6px rgba(182, 90, 52, 0.55); transform: translateY(-1px); }
+
+.btn-dark { background: #1e1a16; color: #ede6d8; }
+.btn-dark:hover:not(:disabled) { background: #2b2620; transform: translateY(-1px); }
+
+.btn-secondary { background: transparent; color: #1e1a16; border: 1.5px solid rgba(30, 26, 22, 0.25); }
+.btn-secondary:hover:not(:disabled) { border-color: #1e1a16; background: rgba(30, 26, 22, 0.04); }
+
+.btn-ghost { background: transparent; color: #2b3a55; padding: 0.6rem 0.9rem; }
+.btn-ghost:hover:not(:disabled) { background: rgba(43, 58, 85, 0.08); }
+
+.btn-danger-ghost { background: transparent; color: #b65a34; padding: 0.4rem 0.7rem; font-size: 0.85rem; }
+.btn-danger-ghost:hover:not(:disabled) { background: rgba(182, 90, 52, 0.08); }
+
+.btn-block { width: 100%; }
+.btn-sm { padding: 0.55rem 1.1rem; font-size: 0.85rem; border-radius: 7px; }
+
+/* ---- Form fields ---- */
+.field-label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 0.4rem; color: #1e1a16; }
+.field-input,
+.field-select,
+.field-textarea {
+  width: 100%;
+  font-family: "Inter", system-ui, sans-serif;
+  font-size: 0.95rem;
+  padding: 0.72rem 0.95rem;
+  border-radius: 8px;
+  border: 1.5px solid rgba(30, 26, 22, 0.16);
+  background: #fdfbf6;
+  color: #1e1a16;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+.field-textarea { resize: vertical; }
+.field-input:focus,
+.field-select:focus,
+.field-textarea:focus {
+  outline: none;
+  border-color: #2b3a55;
+  box-shadow: 0 0 0 3px rgba(43, 58, 85, 0.14);
+}
+.field-input::placeholder,
+.field-textarea::placeholder { color: #a39c8e; }
+.field-hint { font-size: 0.78rem; color: #6b6459; margin-top: 0.35rem; }
+.field-group { display: flex; flex-direction: column; gap: 0.4rem; }
+
+.field-input-wrap { position: relative; }
+.field-input-wrap .field-input { padding-left: 2.5rem; }
+.field-input-wrap .field-icon {
+  position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%);
+  color: #8a8378; pointer-events: none;
+}
+.field-input-wrap .field-toggle {
+  position: absolute; right: 0.6rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: #6b6459; font-size: 0.78rem;
+  font-weight: 600; padding: 0.3rem 0.4rem;
+}
+.field-input-wrap .field-toggle:hover { color: #1e1a16; }
+
+/* ---- Surfaces ---- */
+.panel {
+  background: #fdfbf6;
+  border: 1px solid rgba(30, 26, 22, 0.08);
+  border-radius: 18px;
+  box-shadow: 0 1px 3px rgba(30, 26, 22, 0.05), 0 20px 45px -24px rgba(30, 26, 22, 0.35);
+}
+.surface-card {
+  background: #e2dac8;
+  border: 1px solid rgba(30, 26, 22, 0.1);
+  border-radius: 14px;
+}
+
+/* ---- Badges ---- */
+.badge { display: inline-flex; align-items: center; gap: 0.3rem; font-size: 0.74rem; font-weight: 700; padding: 0.22rem 0.6rem; border-radius: 999px; letter-spacing: 0.01em; }
+.badge-rust { background: rgba(182, 90, 52, 0.12); color: #a34e2b; }
+.badge-moss { background: rgba(92, 110, 74, 0.14); color: #47562f; }
+.badge-indigo { background: rgba(43, 58, 85, 0.1); color: #2b3a55; }
+.badge-muted { background: rgba(30, 26, 22, 0.08); color: #6b6459; }
+
+/* ---- Nav ---- */
+.nav-link {
+  position: relative;
+  padding-bottom: 5px;
+  color: rgba(30, 26, 22, 0.72);
+  font-weight: 500;
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+.nav-link::after {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 2px;
+  background: #b65a34;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.2s ease;
+}
+.nav-link:hover { color: #1e1a16; }
+.nav-link:hover::after,
+.nav-link-active::after { transform: scaleX(1); }
+.nav-link-active { color: #1e1a16; font-weight: 600; }
+
+/* ---- Tabs (auth page) ---- */
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: 0;
+  font-family: "Inter", system-ui, sans-serif;
+  font-weight: 600;
+  font-size: 0.95rem;
+  padding: 0.9rem 0;
+  cursor: pointer;
+  color: #8a8378;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+  transition: color 0.15s ease, border-color 0.15s ease;
+}
+.tab-btn.is-active { color: #1e1a16; border-color: #2b3a55; }
+
+/* ---- Banners / status messages ---- */
+.banner { display: flex; gap: 0.6rem; align-items: flex-start; font-size: 0.88rem; padding: 0.75rem 0.95rem; border-radius: 10px; }
+.banner-error { background: rgba(182, 90, 52, 0.1); color: #8f4325; }
+.banner-success { background: rgba(92, 110, 74, 0.12); color: #3f4d2b; }
+.banner-info { background: rgba(43, 58, 85, 0.08); color: #2b3a55; }
+
+/* ---- Variant / filter chips ---- */
+.chip {
+  font-family: "Inter", system-ui, sans-serif;
+  padding: 0.45rem 1rem;
+  border: 1.5px solid rgba(30, 26, 22, 0.22);
+  border-radius: 999px;
+  background: #fdfbf6;
+  cursor: pointer;
+  font-size: 0.88rem;
+  transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease;
+}
+.chip:hover:not(:disabled) { border-color: #1e1a16; }
+.chip.is-selected { border-color: #2b3a55; background: #2b3a55; color: #fdfbf6; }
+.chip:disabled { opacity: 0.35; text-decoration: line-through; cursor: not-allowed; }
+
+/* ---- Avatar ---- */
+.avatar-circle {
+  width: 2rem; height: 2rem; border-radius: 999px;
+  background: #2b3a55; color: #ede6d8;
+  display: inline-flex; align-items: center; justify-content: center;
+  font-size: 0.78rem; font-weight: 700; font-family: "Inter", system-ui, sans-serif;
+  flex-shrink: 0;
+}
+
+/* ---- Hamburger / mobile menu ---- */
+.hamburger-btn { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; width: 2.5rem; height: 2.5rem; background: transparent; border: none; border-radius: 8px; cursor: pointer; }
+.hamburger-btn:hover { background: rgba(30, 26, 22, 0.06); }
+.hamburger-line { display: block; width: 20px; height: 2px; background: #1e1a16; border-radius: 2px; transition: transform 0.25s ease, opacity 0.2s ease; }
+.hamburger-btn[aria-expanded="true"] .hamburger-line:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+.hamburger-btn[aria-expanded="true"] .hamburger-line:nth-child(2) { opacity: 0; }
+.hamburger-btn[aria-expanded="true"] .hamburger-line:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+.mobile-nav-link {
+  display: block;
+  padding: 0.85rem 0.25rem;
+  font-weight: 500;
+  color: rgba(30, 26, 22, 0.82);
+  text-decoration: none;
+  border-bottom: 1px solid rgba(30, 26, 22, 0.08);
+}
+.mobile-nav-link:last-of-type { border-bottom: none; }
+.mobile-nav-link:hover { color: #1e1a16; }
+.mobile-nav-link.nav-link-active { color: #b65a34; font-weight: 700; }
+
+/* ---- Checkout / payment ---- */
+.pay-method-btn {
+  display: flex; align-items: center; gap: 0.65rem;
+  border: 1.5px solid rgba(30, 26, 22, 0.16); border-radius: 10px;
+  padding: 0.85rem 1rem; font-size: 0.9rem; font-weight: 600;
+  background: #fdfbf6; cursor: default;
+}
+.step-badge {
+  width: 1.6rem; height: 1.6rem; border-radius: 999px; background: #2b3a55; color: #ede6d8;
+  display: inline-flex; align-items: center; justify-content: center; font-size: 0.78rem; font-weight: 700; flex-shrink: 0;
+}
+
+/* ---- Product / content cards ---- */
+.product-card { display: block; text-decoration: none; color: inherit; }
+.product-card-image {
+  aspect-ratio: 3 / 4;
+  background-color: #e2dac8;
+  background-size: cover;
+  background-position: center;
+  border-radius: 10px;
+  border: 1px solid rgba(30, 26, 22, 0.08);
+  margin-bottom: 0.75rem;
+  overflow: hidden;
+  transition: box-shadow 0.2s ease;
+}
+.product-card:hover .product-card-image { box-shadow: 0 10px 28px -14px rgba(30, 26, 22, 0.4); }
